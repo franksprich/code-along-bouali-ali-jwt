@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 @Service
 public class JwtService {
 
-    private static final String MY = "xx";
     private static final Logger LOG = LoggerFactory.getLogger(JwtService.class);
 
     /* 256-bit key */
@@ -37,7 +36,7 @@ public class JwtService {
 
     @PostConstruct
     public void echo() {
-        LOG.info("HIGHLY UNSECURE! secretKey: {} {}", secretKey, MY);
+        LOG.info("HIGHLY UNSECURE! secretKey: {}", secretKey);
     }
 
     public String extractUsername(String token) {
