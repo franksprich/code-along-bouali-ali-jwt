@@ -23,8 +23,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTService jwtService;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    private static final String AUTH_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(
@@ -33,17 +35,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        final String jwtToken;
+        final String token;
         final String userEmail;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(AUTH_PREFIX)) {
             filterChain.doFilter(request, response);
-            return;
-        }
-        /* starting from 7 because of String from above: "Bearer " */
-        jwtToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwtToken);
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+        } else {
+            /* Starting from AUTH_PREFIX.length() (7) because of token is appended to AUTH_PREFIX ("Bearer ") */
+            token = authHeader.substring(AUTH_PREFIX.length());
+            userEmail = jwtService.extractUsername(token);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            }
         }
     }
 }

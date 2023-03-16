@@ -13,3 +13,17 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+app:
+  jwt:
+    secret.key: "28482B4D6251655468566D597133743677397A24432646294A404E635266556A"
+
+# ===============================
+# = LOGGING
+# ===============================
+#logging.config=file:src/main/resources/logback-default.xml
+logging:
+  level:
+    root: info
+    edu.security.jwt: debug
+    org.hibernate: error
+    org.hibernate.persister.entity: error

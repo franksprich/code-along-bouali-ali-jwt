@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- <configuration scan="true" scanPeriod="90 seconds"> -->
+	<!-- <include resource="org/springframework/boot/logging/logback/base.xml" /> -->
+	<logger name="org.springframework" level="INFO" />
+	<logger name="edu.security.jwt" level="DEBUG" />
+
+	<!-- Human-readable to stdout - configuration -->
+	<appender name='CONSOLE' class='ch.qos.logback.core.ConsoleAppender'>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta([%-10.10thread]) %green([%X{traceId:-}]) %green([%X{spanId:-}]) %yellow([%-36.36logger{36}]) %msg %n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+</configuration>

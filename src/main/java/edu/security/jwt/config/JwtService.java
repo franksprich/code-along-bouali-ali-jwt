@@ -4,17 +4,21 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoder;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.User;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.awt.desktop.PreferencesEvent;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {DESCRIPTION}
@@ -22,17 +26,26 @@ import java.util.function.Function;
  * @author Frank Sprich
  */
 @Service
-public class JWTService {
+public class JwtService {
+
+    private static final String MY = "xx";
+    private static final Logger LOG = LoggerFactory.getLogger(JwtService.class);
 
     /* 256-bit key */
-    private static final String SECRET_KEY = "28482B4D6251655468566D597133743677397A24432646294A404E635266556A";
+    @Value("${app.jwt.secret.key}")
+    private String secretKey;
 
-    public String extractUsername(String jwtToken) {
-        return extractClaim(jwtToken, Claims::getSubject);
+    @PostConstruct
+    public void echo() {
+        LOG.info("HIGHLY UNSECURE! secretKey: {} {}", secretKey, MY);
     }
 
-    public <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(jwtToken);
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
@@ -68,17 +81,17 @@ public class JWTService {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String jwtToken) {
+    private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parseClaimsJws(jwtToken)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
